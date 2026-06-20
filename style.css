@@ -648,8 +648,6 @@ a:hover { color: var(--accent); }
 /* ---------- FAQ Accordion ---------- */
 .faq-section {
   margin-top: 3rem;
-  scroll-behavior: smooth;
-  overflow-anchor: none;   /* prevents automatic scroll jump when FAQ toggles */
 }
 .faq-section h3 {
   font-size: 1.6rem;
@@ -912,14 +910,7 @@ a:hover { color: var(--accent); }
   backdrop-filter: blur(8px);
   font-family: inherit;
 }
-
-/* Select arrow styling (no scroll jump) */
 .form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
   color-scheme: dark;
   accent-color: var(--primary);
 }
@@ -939,18 +930,13 @@ a:hover { color: var(--accent); }
 .form-group textarea::placeholder {
   color: var(--text-muted);
 }
-
-/* FIX: focus no longer causes overflow / scroll jump */
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   border-color: var(--primary);
   background: rgba(139, 92, 246, 0.08);
-  outline: 3px solid rgba(139, 92, 246, 0.3);
-  outline-offset: 2px;
-  box-shadow: none;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), inset 0 1px 2px rgba(0,0,0,0.1);
 }
-
 .form-group textarea {
   min-height: 120px;
   resize: vertical;
@@ -991,24 +977,16 @@ a:hover { color: var(--accent); }
 .result-item:last-child { border-bottom: none; }
 .result-label { font-weight: 600; color: var(--text-secondary); font-size: 0.95rem; }
 .result-value { color: var(--accent-glow); font-weight: 700; font-size: 1.4rem; font-family: 'Courier New', monospace; }
-
 .result-box {
   background: rgba(139, 92, 246, 0.1);
   border-left: 4px solid var(--primary);
   border-radius: var(--radius-md);
   padding: 1.8rem;
   margin: 1.5rem 0;
-  transition: box-shadow 0.3s;   /* smooth hover effect */
 }
 .result-box.secondary { border-left-color: var(--accent); background: rgba(6, 182, 212, 0.1); }
 .result-box.success { border-left-color: var(--success); background: rgba(16, 185, 129, 0.1); }
 .result-box.warning { border-left-color: var(--warning); background: rgba(245, 158, 11, 0.1); }
-
-/* No more layout shift on hover – only a glow */
-.result-box:hover {
-  transform: none;
-  box-shadow: var(--shadow-glow), 0 0 20px rgba(139, 92, 246, 0.3);
-}
 
 /* ---------- Breadcrumb ---------- */
 .breadcrumb {
@@ -1114,56 +1092,16 @@ a:hover { color: var(--accent); }
 
 /* ---------- Ad spaces ---------- */
 .ad-space {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  background: transparent;
-  border: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-radius: 0;
-  padding: 0;
+  background: var(--bg-glass);
+  backdrop-filter: blur(8px);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
   text-align: center;
-  overflow: hidden;
-  min-height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.ad-space.large {
-  max-width: 1200px;
-  min-height: 90px;
-}
-
-.ad-space.medium {
-  max-width: 400px;
-  min-height: 60px;
-}
-
-.ad-space::before,
-.ad-space::after {
-  display: none;
-}
-
-.ad-space ins.adsbygoogle {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Temporary placeholder until ads load */
-.ad-space::before {
-  content: "Advertisement";
-  display: block;
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.5rem;
-}
+.ad-space.large { min-height: 350px; }
+.ad-space.medium { min-height: 250px; }
 
 /* ===========================================
    RESPONSIVE DESIGN
@@ -1177,21 +1115,24 @@ a:hover { color: var(--accent); }
 }
 
 /* Mobile landscape & large phones */
+/* Mobile landscape & large phones */
 @media (max-width: 768px) {
   html { font-size: 15px; }
   h1 { font-size: 2.8rem; }
   h2 { font-size: 2.2rem; }
 
+  /* Keep everything on ONE row – NO WRAP */
   .navbar-content {
     padding: 0.8rem 0;
-    flex-wrap: nowrap !important;
+    flex-wrap: nowrap !important;   /* <- critical fix */
   }
 
+  /* The right‑side container (toggle + hamburger) must stay inline */
   .navbar-content > div:last-child {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-shrink: 0;
+    flex-shrink: 0;                 /* never let it drop */
   }
 
   .navbar-nav {
@@ -1229,48 +1170,30 @@ a:hover { color: var(--accent); }
     bottom: 1.5rem;
     right: 1.5rem;
   }
-  
-  /* Ad space tuning */
-  .ad-space.large {
-    max-width: 100%;
-    min-height: 60px;
-  }
-  .ad-space.medium {
-    max-width: 100%;
-    min-height: 50px;
-  }
 }
+/* Small phones */
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .navbar-brand { font-size: 1.5rem; }
+  .hero h1 { font-size: 2.5rem; }
 
-/* Small phones + currency converter special responsive */
-@media (max-width: 600px) {
-  .calculator-container .form-row {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .calculator-form {
-    padding: 1.5rem !important;
-  }
-  .result-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .hero-buttons {
     flex-direction: column;
     align-items: center;
   }
   .btn-lg { padding: 0.9rem 2rem; font-size: 1rem; }
-  
+
   .footer-content { grid-template-columns: 1fr; }
   .newsletter { margin: 2rem 1rem; padding: 3rem 1.5rem; }
-  
+
   .section { padding: 2rem 1rem; }
-  
+
   .result-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .share-buttons {
     flex-direction: column;
     gap: 0.6rem;
@@ -1280,7 +1203,6 @@ a:hover { color: var(--accent); }
     border-radius: var(--radius-md);
   }
 }
-
 /* ========== Trusted By & Stats (Pure CSS) ========== */
 .trusted-section {
   background: var(--bg-glass);
@@ -1355,8 +1277,7 @@ a:hover { color: var(--accent); }
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-secondary);
-}
-.logos-row  {
+}.logos-row  {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1379,7 +1300,7 @@ a:hover { color: var(--accent); }
   color: var(--primary-light);
 }
 
-/* Simple card entrance */
+/* Simple card entrance (no JS needed, runs on page load) */
 .card {
   animation: fadeInUp 0.8s ease both;
 }
@@ -1387,6 +1308,7 @@ a:hover { color: var(--accent); }
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* Stagger the cards */
 .grid-4 .card:nth-child(1) { animation-delay: 0.1s; }
 .grid-4 .card:nth-child(2) { animation-delay: 0.2s; }
 .grid-4 .card:nth-child(3) { animation-delay: 0.3s; }
@@ -1400,3 +1322,74 @@ a:hover { color: var(--accent); }
   .trusted-stats { grid-template-columns: 1fr; }
   .stat-number { font-size: 2.2rem; }
 }
+
+/* ---------- Professional Ad Containers ---------- */
+.ad-space {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  /* remove heavy glass effect, keep it subtle */
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  padding: 0;
+  text-align: center;
+  overflow: hidden;
+  min-height: auto;           /* let the ad set its own height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Large ad banner – typical horizontal or responsive */
+.ad-space.large {
+  max-width: 1200px;          /* wide enough for a 728x90 or responsive unit */
+  min-height: 90px;           /* fallback, real height set by ad */
+}
+
+/* Medium ad – smaller rectangle or responsive */
+.ad-space.medium {
+  max-width: 400px;
+  min-height: 60px;
+}
+
+/* Remove any leftover dashed border or box shadow */
+.ad-space::before,
+.ad-space::after {
+  display: none;
+}
+
+/* Ensure the AdSense ins element fills the container */
+.ad-space ins.adsbygoogle {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* Temporary placeholder until ads load */
+.ad-space::before {
+  content: "Advertisement";
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .ad-space.large {
+    max-width: 100%;
+    min-height: 60px;
+  }
+  .ad-space.medium {
+    max-width: 100%;
+    min-height: 50px;
+  }
+}
+/* ---------- Mobile Navbar Alignment Fix ---------- */
+ 
