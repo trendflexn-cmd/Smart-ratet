@@ -2,9 +2,7 @@
    Smart Rate - Main JavaScript
    =========================== */
 
-// DOM Elements
-const hamburger = document.querySelector('.hamburger');
-const navbar = document.querySelector('.navbar-nav');
+// DOM Elements (hamburger & navbar are no longer globals – queried inside initNavbar)
 const themeToggle = document.querySelector('.theme-toggle');
 const backToTop = document.querySelector('.back-to-top');
 const body = document.body;
@@ -17,21 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
 });
 
-// Navbar Toggle
+// Navbar Toggle – fixed to always find the elements on click
 function initNavbar() {
-  if (!hamburger) return;
-  
-  hamburger.addEventListener('click', () => {
+  const hamburger = document.querySelector('.hamburger');
+  const navbar = document.querySelector('.navbar-nav');
+
+  if (!hamburger || !navbar) {
+    console.warn('Navbar elements not found – menu toggle will not work.');
+    return;
+  }
+
+  // Clone the hamburger to remove any previously attached broken listeners
+  const newHamburger = hamburger.cloneNode(true);
+  hamburger.parentNode.replaceChild(newHamburger, hamburger);
+
+  newHamburger.addEventListener('click', () => {
     navbar.classList.toggle('active');
-    hamburger.classList.toggle('active');
+    newHamburger.classList.toggle('active');
   });
-  
-  // Close menu when clicking on a link
-  const navLinks = navbar?.querySelectorAll('a');
-  navLinks?.forEach(link => {
+
+  const navLinks = navbar.querySelectorAll('a');
+  navLinks.forEach(link => {
     link.addEventListener('click', () => {
       navbar.classList.remove('active');
-      hamburger.classList.remove('active');
+      newHamburger.classList.remove('active');
     });
   });
 }
